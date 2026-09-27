@@ -8,7 +8,7 @@ GW2 sets `context_len` to 48 (the part Mumble uses to tell shards apart) and sti
 
 ## What you need on the game machine
 
-Windows named mapping: `MumbleLink`. On macOS, Guild Wars 2 under Wine (Sikarugir, CrossOver, Whisky) keeps that name inside the wineserver. `read` finds the running `Gw2-64.exe`, builds a Windows reader, and runs it in that prefix. Be in the world on a character. `-mumble 0` turns the link off.
+Windows named mapping: `MumbleLink`. On Windows, `read` opens that mapping in the same session as `Gw2-64.exe`. On macOS, Guild Wars 2 under Wine (Sikarugir, CrossOver, Whisky) keeps that name inside the wineserver. `read` finds the running `Gw2-64.exe`, builds a Windows reader, and runs it in that prefix. Be in the world on a character. `-mumble 0` turns the link off. Run the tool as the same user as the game.
 
 A copied 5460-byte file still works with `dump`.
 
@@ -22,6 +22,14 @@ go run ./cmd/gw2-mumblelink dump ./path/to/MumbleLink
 go run ./cmd/gw2-mumblelink mcp
 GW2ML_TOKEN=choose-a-secret go run ./cmd/gw2-mumblelink serve -listen 0.0.0.0:8765
 ```
+
+On Windows the same commands are `gw2-mumblelink.exe read`, `where`, `dump`, `mcp`, and `serve`. Build it from this tree with:
+
+```
+GOOS=windows GOARCH=amd64 CGO_ENABLED=0 go build -o gw2-mumblelink.exe ./cmd/gw2-mumblelink
+```
+
+`gw2-mumblelink.exe` in this directory is that build. Copy it to the Windows machine that is running Guild Wars 2. `set GW2ML_TOKEN=choose-a-secret` before `serve` when the listen address is not loopback.
 
 `mcp` speaks MCP on stdin. `serve` speaks the same tools over Streamable HTTP at `POST /mcp`, so another model on another machine can connect. Listening beyond loopback requires `GW2ML_TOKEN`. The client sends `Authorization: Bearer <token>`.
 
